@@ -8,32 +8,45 @@
 </template>
 
 <script>
-import {bus} from './../main.js';
+import {
+    bus
+} from './../main.js';
 export default {
     props: ['tareas'],
     data() {
         return {
-            
+
             nuevaTarea: ''
         }
     },
     methods: {
         agregarTarea: function () {
             var texto = this.nuevaTarea.trim();
+            
             if (texto) {
-                this.tareas.push({
+
+                this.$http.post('tareas.json', {
                     texto: this.nuevaTarea,
                     terminar: false
+                }).then(respuesta => respuesta.json()).then(data => {
+                    this.tareas.push({
+                        id: data.name,
+                        texto,
+                        terminar: false
+                    });
+                    bus.actualizarContador(this.tareas.length);
+                
+
                 });
-               
-        bus.actualizarContador(this.tareas.length);
+
+                
             }
-            
+
             this.nuevaTarea = '';
         }
     },
-    created(){
-       bus.actualizarContador(this.tareas.length);
+    created() {
+        bus.actualizarContador(this.tareas.length);
     }
 
 }

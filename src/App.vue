@@ -3,10 +3,10 @@
     <div class="container">
 
         <div class="jumbotron">
-            <titulo :titulo="titulo" ></titulo>
-            <nueva-tarea :tareas="tareas" >
+            <titulo :titulo="titulo"></titulo>
+            <nueva-tarea :tareas="tareas">
             </nueva-tarea>
-            <lista-tareas :tareas="tareas" >
+            <lista-tareas :tareas="tareas">
             </lista-tareas>
 
         </div>
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import {bus} from './main.js';
 import Titulo from './Components/TituloComponent';
 import NuevaTarea from './Components/NuevaTareaComponent';
 import ListaTareas from './Components/ListaTareaComponent';
@@ -29,21 +30,9 @@ export default {
 
     data() {
         return {
-            
+
             titulo: 'Lista de Tareas',
-            tareas: [{
-                    texto: "Aprender VUE.js",
-                    terminar: false
-                }, {
-                    texto: "Aprender Angula2",
-                    terminar: false
-                },
-                {
-                    texto: "Aprender Ionic 2",
-                    terminar: false
-                }
-            ],
-           
+            tareas:[],
             
         }
 
@@ -52,6 +41,21 @@ export default {
         totalContador() {
             this.totalTareas = this.tareas.length;
         }
+    },
+    created() {
+        this.$http.get("tareas.json").then(function (resultado) {
+            return resultado.json();
+        }).then(function (data) {
+          for(let id in data){
+              let tarea={
+                  id:id,
+                  texto:data[id].texto,
+                  terminada:data[id].terminada,
+              };
+              this.tareas.push(tarea);
+          }
+           bus.actualizarContador(this.tareas.length);
+        })
     }
 }
 </script>
